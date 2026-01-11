@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Menu</title>
+    <style>
+body { 
+    font-family: sans-serif; 
+    padding: 20px; 
+    background: #f4f4f4; 
+}
+.grid { 
+    display: flex;  
+    flex-wrap: wrap;  
+    gap: 20px; 
+}
+.dish {  
+    background: white; 
+    padding: 15px;  
+    border-radius: 8px; 
+    width: 200px; 
+    text-align: center; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+    border: 1px solid #d3f5d3; 
+    transition: transform 0.3s ease, box-shadow 0.3s ease;  
+}
+.dish:hover { 
+    transform: scale(1.05); 
+    border-color: #56c056;
+    box-shadow: 0 8px 18px rgba(0, 150, 50, 0.2);
+}
+        img { 
+            width: 100%; 
+            height: 120px; 
+            object-fit: cover; 
+            border-radius: 5px; 
+        }
+
+        .controls { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 10px; 
+            margin-top: 10px; 
+        }
+
+        button { 
+            cursor: pointer; 
+            padding: 5px 10px; 
+        }
+
+        #order-bar { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            width: 100%; 
+            padding: 20px; 
+            text-align:right; 
+            display: none; 
+        }
+
+      
+        #order-bar button {
+            background: #27ae60; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 5px;
+            color: white;
+        }
+
+        #order-bar button:hover {
+            background: #4caf50;
+        }
+
+
+
+    </style>
+</head>
+<body>
+    <h1>Notre Menu</h1>
+    <div class="grid">
+        <% allDishes.forEach(dish => { %>
+            <div class="dish" data-id="<%= dish.id %>" data-price="<%= dish.price %>" data-name="<%= dish.name %>">
+                <img src="/<%= dish.image_url %>">
+                <h3><%= dish.name %></h3>
+                <p><%= dish.price %> dh</p>
+                <div class="controls">
+                    <button onclick="updateQty(this, -1)">-</button>
+                    <span class="qty">0</span>
+                    <button onclick="updateQty(this, 1)">+</button>
+                </div>
+            </div>
+        <% }) %>
+    </div>
+
+    <div id="order-bar">
+        <span>Total : <strong id="total-val">0</strong> dh</span>
+        <button onclick="goToCheck()" style="background: #27ae60; border: none; padding: 10px 20px; margin-left: 20px; border-radius: 5px;">Commander</button>
+    </div>
+
+    <script>
+        let cart = {};
+        function updateQty(btn, delta) {
+            const card = btn.closest('.dish');
+            const id = card.dataset.id;
+            const price = parseFloat(card.dataset.price);
+            const qtySpan = card.querySelector('.qty');
+            
+            let current = parseInt(qtySpan.innerText) + delta;
+            if (current < 0) current = 0;
+            qtySpan.innerText = current;
+
+            if (current > 0) cart[id] = { qty: current, price: price };
+            else delete cart[id];
+
+            renderBar();
+        }
+
+        function renderBar() {
+            let total = 0;
+            for (let id in cart) total += cart[id].qty * cart[id].price;
+            document.getElementById('total-val').innerText = total.toFixed(2);
+            document.getElementById('order-bar').style.display = total > 0 ? 'block' : 'none';
+        }
+
+        function goToCheck() {
+            localStorage.setItem('finalCart', JSON.stringify(cart));
+            window.location.href = '/checkout';
+        }
+    </script>
+</body>
+</html>

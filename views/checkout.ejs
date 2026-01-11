@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>passer la commande </title>
+    <style>
+        body { font-family: sans-serif; max-width: 500px; margin: 50px auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; }
+        input, textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
+        button { width: 100%; padding: 15px; background: #27ae60; color: white; border: none; font-size: 1.1em; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h2>Détails de livraison</h2>
+    <form action="/confirm-order" method="POST">
+        <input type="text" name="nom" placeholder="Votre Nom" required>
+        <input type="text" name="prenom" placeholder="Votre Prénom" required>
+        <input type="tel" name="tel" placeholder="Téléphone" required>
+        <textarea name="adresse" placeholder="Adresse complète" required></textarea>
+        
+        <p>Total à payer : <strong id="display-total"></strong> dh</p>
+        
+        <input type="hidden" name="total_amount" id="form-total">
+        <input type="hidden" name="cart_data" id="form-cart">
+
+        <button type="submit">Confirmer la commande</button>
+    </form>
+
+    <script>
+        const cart = JSON.parse(localStorage.getItem('finalCart'));
+        let total = 0;
+        for(let id in cart) { total += cart[id].qty * cart[id].price; }
+
+        document.getElementById('display-total').innerText = total.toFixed(2);
+        document.getElementById('form-total').value = total.toFixed(2);
+        document.getElementById('form-cart').value = JSON.stringify(cart);
+    </script>
+</body>
+</html>
